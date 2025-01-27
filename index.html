@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>طلب البيانات</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #4caf50, #8bc34a);
+      color: #fff;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light-theme {
+      background: #fff;
+      color: #333;
+    }
+    .form-container {
+      background: #222;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.light-theme .form-container {
+      background: #f7f7f7;
+      color: #333;
+    }
+    .form-container h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #8bc34a;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      outline: none;
+      background: #333;
+      color: #fff;
+    }
+    .form-group input:focus {
+      border: 2px solid #8bc34a;
+    }
+    .form-group .error-message {
+      color: #f44336;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+    .select-container {
+      position: relative;
+      margin-bottom: 15px;
+    }
+    .custom-select {
+      position: relative;
+      background: #333;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+    }
+    .custom-options {
+      display: none;
+      position: absolute;
+      background: #333;
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+      border-radius: 5px;
+      z-index: 10;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+    .custom-options.active {
+      display: block;
+    }
+    .custom-option {
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .custom-option:hover {
+      background: #444;
+    }
+    .checkbox-group {
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+    }
+    .checkbox-group input {
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .loader {
+      border: 5px solid #333;
+      border-top: 5px solid #8bc34a;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .success-message {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+        .theme-toggle {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      background: #fff;
+      color: #333;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+    }
+    body.light-theme .theme-toggle {
+      background: #333;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+    
+  <button id="themeToggle" class="theme-toggle">تبديل الثيم</button>  <div class="form-container">
+    <h2>طلب شراء عداد في بوت ميرو</h2>
+    <form id="orderForm">
+      <div class="form-group">
+        <label for="name">الاسم</label>
+        <input type="text" id="name" required>
+        <div class="error-message" id="nameError">الرجاء إدخال اسم صحيح</div>
+      </div>
+      <div class="form-group">
+        <label for="username">اليوزر (يجب أن يحتوي على @)</label>
+        <input type="text" id="username" required>
+        <div class="error-message" id="usernameError">الرجاء إدخال يوزر صحيح</div>
+      </div>
+      <div class="form-group">
+        <label for="id">الايدي (9 أو 10 أرقام)</label>
+        <input type="text" id="id" required>
+        <div class="error-message" id="idError">الرجاء إدخال ايدي صحيح</div>
+      </div>
+      <div class="select-container">
+        <div class="custom-select" id="customSelect">اختر نوع العداد من هنا*</div>
+        <div class="custom-options" id="customOptions">
+          <div class="custom-option" data-value="250" data-price="(1)">250</div>
+          <div class="custom-option" data-value="500" data-price="(2)">500</div>
+          <div class="custom-option" data-value="750" data-price="(3)">750</div>
+          <div class="custom-option" data-value="1000" data-price="(4)">1000</div>
+          <div class="custom-option" data-value="2000" data-price="(5)">2000</div>
+          <div class="custom-option" data-value="3000" data-price="(6)">3000</div>
+          <div class="custom-option" data-value="4000" data-price="(7)">4000</div>      
+          <div class="custom-option" data-value="5000" data-price="(8)">5000</div> 
+          <div class="custom-option" data-value="6000" data-price="(9)">6000</div>                                                                     
+        </div>
+      </div>
+      <div class="loader" id="loader"></div>
+      <p class="success-message" id="successMessage"></p>
+      <button type="button" class="btn" id="submitBtn">إرسال</button>
+    </form>
+  </div>
+  <script>
+    const form = document.getElementById("orderForm");
+    const nameInput = document.getElementById("name");
+    const usernameInput = document.getElementById("username");
+    const idInput = document.getElementById("id");
+    const customSelect = document.getElementById("customSelect");
+    const customOptions = document.getElementById("customOptions");
+    const loader = document.getElementById("loader");
+    const successMessage = document.getElementById("successMessage");
+    const submitBtn = document.getElementById("submitBtn");
+    // تبديل الثيم
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("light-theme");
+    });
+    let selectedCounter = null;
+    let selectedPrice = null;
+
+    // إظهار الخيارات
+    customSelect.addEventListener("click", () => {
+      customOptions.classList.toggle("active");
+    });
+
+    // اختيار نوع العداد
+    customOptions.addEventListener("click", (e) => {
+      if (e.target.classList.contains("custom-option")) {
+        selectedCounter = e.target.getAttribute("data-value");
+        selectedPrice = e.target.getAttribute("data-price");
+        customSelect.textContent = `${selectedPrice}  ${selectedCounter}`;
+        customOptions.classList.remove("active");
+      }
+    });
+
+    // إرسال الطلب
+    submitBtn.addEventListener("click", async () => {
+      let valid = true;
+
+      if (nameInput.value.trim() === "") {
+        showError("name", "nameError", "الرجاء إدخال الاسم");
+        valid = false;
+      } else {
+        clearError("name", "nameError");
+      }
+
+      if (!usernameInput.value.includes("@")) {
+        showError("username", "usernameError", "الرجاء إدخال يوزر صحيح");
+        valid = false;
+      } else {
+        clearError("username", "usernameError");
+      }
+
+      if (!/^\d{9,10}$/.test(idInput.value)) {
+        showError("id", "idError", "الرجاء إدخال ايدي صحيح");
+        valid = false;
+      } else {
+        clearError("id", "idError");
+      }
+
+      if (!selectedCounter) {
+        alert("الرجاء اختيار نوع العداد");
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      const confirmOrder = confirm(`
+        تأكيد الطلب:
+        - الاسم: ${nameInput.value}
+        - اليوزر: ${usernameInput.value}
+        - الايدي: ${idInput.value}
+        - نوع العداد: ${selectedCounter}
+      `);
+
+      if (!confirmOrder) return;
+
+      // عرض تحميل
+      loader.style.display = "block";
+      submitBtn.disabled = true;
+
+      const botToken = "6418845303:AAFNx_TT6oRMUv8lLhMpeqAmTO_L1516ymY";
+      const chatId = "6454550864";
+      const message = `
+
+سيوفي عندك طلب شراء عداد 🙃⭐
+👥 الاسم: ${nameInput.value}
+✔️ اليوزر: ${usernameInput.value}
+✨ الايدي: ${idInput.value}
+🟢 نوع العداد: ${selectedCounter}
+🔷 التاريخ: ${new Date().toLocaleString()}
+      `;
+
+      try {
+        // إرسال الرسالة إلى بوت تلجرام
+        const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.ok) {
+          const now = new Date();
+          now.setDate(now.getDate() + 1); // إضافة يوم واحد
+          successMessage.textContent = `تم إرسال طلبك. انتظر موافقة الإدارة حتى ${now.toLocaleString()} وفي حال لم يصلك العداد قم بمراسلة الدعم الفني `;
+          successMessage.style.display = "block";
+        } else {
+          successMessage.textContent = "حدث خطأ أثناء إرسال البيانات.";
+          successMessage.style.display = "block";
+        }
+      } catch (error) {
+        successMessage.textContent = "حدث خطأ أثناء إرسال البيانات.";
+        successMessage.style.display = "block";
+      } finally {
+        loader.style.display = "none";
+        submitBtn.disabled = false;
+      }
+    });
+
+    function showError(inputId, errorId, message) {
+      document.getElementById(inputId).classList.add("error");
+      document.getElementById(errorId).style.display = "block";
+      document.getElementById(errorId).textContent = message;
+    }
+
+    function clearError(inputId, errorId) {
+      document.getElementById(inputId).classList.remove("error");
+      document.getElementById(errorId).style.display = "none";
+    }
+  </script>
+</body>
+</html>
